@@ -1,86 +1,141 @@
 #include <stdio.h>
 #include <string.h>
 
-int check(char** pos);
-void find(char** pos, int x, int y);
+#define MAX_MAZE_HEIGHT 500
+#define MAX_MAZE_WIDTH 500
+
+int is_exist_path(int pos_height, int pos_width);
+void go_one_step(int pos_height, int pos_width);
+int isOpenUp(int y, int x);
+int isOpenDown(int y, int x);
+int isOpenLeft(int y, int x);
+int isOpenRight(int y, int x);
+
+static int maze_height, maze_width, add_wall_number;
+static char maze[MAX_MAZE_HEIGHT][MAX_MAZE_WIDTH];
+
 int main(int argc, char const *argv[]) {
 
-  static int n, m, k;
-  int len;
-  char buf[502][502];
+  scanf("%d %d %d\n", &maze_height, &maze_width, &add_wall_number);
 
-  scanf("%d %d %d", &n, &m, &k);
-
-  for (int i = 0; i < n; i++) {
-    fgets(buf[i]);
-    buf[i][m] = '\0';
-  }
-
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
-      if (k == 0) {
-        break;
-      }
-      if (buf[i][j] == '.') {
-        buf[i][j] = 'X';
-        if (check(buf) == 1) {
-
-        }
-        else {
-
-        }
-      }
-      k--;
+  for (int i = 0; i < maze_height; i++) {
+    for (int j = 0; j < maze_width; j++) {
+      int temp;
+      while ((temp = getchar()) == '\n');
+      maze[i][j] = temp;
     }
   }
 
+  for (int i = 0; i < maze_height; i++) {
+    for (int j = 0; j < maze_width; j++) {
+      if (maze[i][j] == '.') {
+        go_one_step(i, j);
 
+        for (int k = 0; k < maze_height; k++) {
+          for (int l = 0; l < maze_width; l++) {
+            if (maze[k][l] == 'P') {
+              printf(".");
+            }
+            else {
+              printf("%c", maze[k][l]);
+            }
+          }
+          printf("\n");
+        }
+
+        return 0;
+      }
+    }
+  }
   return 0;
 }
 
-int check(char** buf) {
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
-      if (buf[i][j] != '#' || buf[i][j] != 'X') {
+void go_one_step(int pos_height, int pos_width) {
+  if (add_wall_number <= 0) {
+    return;
+  }
+  maze[pos_height][pos_width] = 'P';
+  if (isOpenUp(pos_height, pos_width) == 1) {
+    go_one_step(pos_height-1 , pos_width);
+  }
+  if (add_wall_number <= 0) {
+    return;
+  }
+  if (isOpenDown(pos_height, pos_width) == 1) {
+    go_one_step(pos_height+1, pos_width);
+  }
+  if (add_wall_number <= 0) {
+    return;
+  }
+  if (isOpenLeft(pos_height, pos_width) == 1) {
+    go_one_step(pos_height, pos_width-1);
+  }
+  if (add_wall_number <= 0) {
+    return;
+  }
+  if (isOpenRight(pos_height, pos_width) == 1) {
+    go_one_step(pos_height, pos_width+1);
+  }
+  if (add_wall_number <= 0) {
+    return;
+  }
+  maze[pos_height][pos_width] = 'X';
+  add_wall_number--;
+  return;
+}
 
-      }
+int isOpenUp(int pos_height, int pos_width) {
+  if (pos_height == 0) {
+    return 0;
+  }
+  else {
+    if (maze[pos_height-1][pos_width] == '.') {
+      return 1;
+    }
+    else {
+      return 0;
     }
   }
 }
 
-void find(char** pos, int x, int y) {
-
-}
-
-int isBlock(char** buf, int x, int y) {
-  if (x == 0 && y == 0) {
-
-  }
-  else if (x == 0 && y == (n-1)) {
-
-  }
-  else if (x == (m-1) && y == 0) {
-
-  }
-  else if (x == (m-1) && y == (n-1)) {
-
-  }
-  else if (x == 0 && y > 0 && y < (n-1)) {
-
-  }
-  else if (x == (m-1) && y > 0 && y < (n-1)) {
-
-  }
-  else if (x > 0 && x < (m-1) && y == 0) {
-
-  }
-  else if (x > 0 && x < (m-1) && y == (n-1)) {
-
+int isOpenDown(int pos_height, int pos_width) {
+  if (pos_height == maze_height-1) {
+    return 0;
   }
   else {
-    if (buf[x-1][y] == '.' ||
-        buf[x+1][y] == '.' ||
-        buf[x][y-1] == '.' ||
-        buf[x][y+1] == '.')
+    if (maze[pos_height+1][pos_width] == '.') {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+int isOpenLeft(int pos_height, int pos_width) {
+  if (pos_width == 0) {
+    return 0;
+  }
+  else {
+    if (maze[pos_height][pos_width-1] == '.') {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+int isOpenRight(int pos_height, int pos_width) {
+  if (pos_width == maze_width-1) {
+    return 0;
+  }
+  else {
+    if (maze[pos_height][pos_width+1] == '.') {
+      return 1;
+    }
+    else {
+      return 0;
+    }
   }
 }
